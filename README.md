@@ -22,6 +22,7 @@ These facets of Internet Speed Tester give the user a complete report of her net
 * BeautifulSoup 4 and Selenium webdriver libraries
 * Time and datetime libraries (built in)
 * Tkinter GUI library (v. 8.6)
+* requests library
 * Chromedriver and geckodriver for automated Google Chrome / Firefox applications (included in repository)
 
 Compiling an `exe` file is currently in the works for users that do not wish to take a developer's approach towards using the application. Otherwise, users are free to look at the pip-generated `requirements.txt` file listed within the repository for precise information about dependencies.
