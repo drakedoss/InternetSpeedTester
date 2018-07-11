@@ -70,18 +70,30 @@ def record_speed(exec_path_driver: str):
     except selenium.common.exceptions.TimeoutException:
         write_to_file(None, None, None)
         alertbox('Program timed out at ' + str(datetime.datetime.now()) + '.', 'Timeout')
+        driver.quit()
         return
     try:
         start_speed_test = driver.find_element_by_class_name('start-text')
     except selenium.common.exceptions.NoSuchElementException:
         write_to_file(None, None, None)
         alertbox('Connection lost at ' + str(datetime.datetime.now()) + '.', 'Error')
+        driver.quit()
         return
+
+    time.sleep(5)
 
     start_speed_test.click()
 
+    now = datetime.datetime.now()
     # Allow for webdriver to obtain webpage with results once it has been loaded in
     while driver.current_url == 'http://www.speedtest.net/':
+        current = datetime.datetime.now()
+        time_delta = current - now
+        time_delta_sec = abs(time_delta.total_seconds())
+        if time_delta_sec >= 180:
+            write_to_file(None, None, None)
+            driver.quit()
+            return
         time.sleep(1)
 
     # Obtain URL with results
@@ -148,9 +160,10 @@ def parse_time(end_time: str) -> int:
             return 12
         if end_time.__contains__('am'):
             return 0
-
     if end_time.__contains__('pm'):
         return 12 + desired_end_time
+    else:
+        return desired_end_time
 
 
 # Detects if the user has entered a str rather than an int for the minute intervals, or if he/she has defined a number
