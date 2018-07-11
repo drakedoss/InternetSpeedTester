@@ -37,7 +37,9 @@ Running the program myself yielded issues with the Chrome option due to a bug th
 IST expects the following input from users:
 
 `Elapsed minutes per speedtest: ` _Any number between 1 and the number of minutes until the end of the speedtesting session_
+
 `Time to end at: ` _Any number between 1 and 12_
+
 `Choice of AM or PM (morning/evening) for session endtime`
 
 Input errors are handled by displaying a popup informing the user of how he should format his input for the program to interpret.
