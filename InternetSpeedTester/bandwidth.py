@@ -4,7 +4,7 @@ Internet Speed Tester by Drake Doss
 Program gives users the ability to access an automated testing environment for their internet speeds, allowing them to
 hold their Internet Service Provider (ISP) responsible for any false, "guaranteed" bandwidth/latency values.
 
-v. 0.1, d. 07/07/2018
+v. 0.3, d. 07/19/2018
 """
 from selenium import webdriver
 from bs4 import BeautifulSoup
@@ -12,12 +12,16 @@ import selenium.common.exceptions
 import requests
 import time
 import datetime
+import matplotlib.pyplot as plt
 from tkinter import *
 """
 This file (bandwidth.py) provides functions to be linked to the front-end which allow the user to begin their automated
 testing experience. Selenium, BeautifulSoup, requests, datetime, and Tkinter libraries are used to parse through the
-website speedtest.net for data regarding the user's bandwidth and latency.
+website speedtest.net for data regarding the user's bandwidth and latency. Matplotlib is used to provide the end user
+with a graphical representation of speed and latency values.
 """
+# Turn on interactive plotting for graph
+plt.ion()
 
 
 # Creates an informational window for the user to receive helpful information regarding when testing is done or if the
@@ -33,7 +37,7 @@ def alertbox(message: str, status: str):
 
 
 # Writes all internet speed data to a file "internet_record.txt" and handles potential exceptions.
-def write_to_file(titles, data, results):
+def write_to_file(titles, data, results, greatest_val):
     i = 0
     file = open('internet_record.txt', 'a+')
     timestamp = str(datetime.datetime.now())
@@ -41,20 +45,30 @@ def write_to_file(titles, data, results):
     if titles is None and data is None and results is None:
         file.write('Connection was lost or weak at ' + timestamp + '\n')
         file.write('-' * (30 + len(timestamp)) + '\n')
-        return
+        return greatest_val, []
 
+    all_float_data = []
     while i < 3:
-        curr_data = str(titles[i] + ': ' + data[i])
+        data_title = titles[i]
+        data_value = data[i]
+        curr_data = str(data_title + ': ' + data_value)
+        float_value = float(data_value[0:3])
+        all_float_data.append(float_value)
+
+        if float_value > greatest_val:
+            greatest_val = float_value
+
         file.write(curr_data + '\n')
         i += 1
 
     file.write('Link to results: ' + results + '\n')
     file.write(('-' * 15) + timestamp + ('-' * 15) + '\n\n')
     file.close()
+    return greatest_val, all_float_data
 
 
 # Records the download and upload speeds of the user's provided internet service, as well as his or her latency.
-def record_speed(exec_path_driver: str):
+def record_speed(exec_path_driver: str, max_value):
 
     # Set up webdriver for initializing speed test analytics
     if exec_path_driver == 'Firefox':
@@ -68,17 +82,17 @@ def record_speed(exec_path_driver: str):
     try:
         driver.get('http://www.speedtest.net')
     except selenium.common.exceptions.TimeoutException:
-        write_to_file(None, None, None)
+        write_to_file(None, None, None, max_value)
         alertbox('Program timed out at ' + str(datetime.datetime.now()) + '.', 'Timeout')
         driver.quit()
-        return
+        return max_value, []
     try:
         start_speed_test = driver.find_element_by_class_name('start-text')
     except selenium.common.exceptions.NoSuchElementException:
-        write_to_file(None, None, None)
+        write_to_file(None, None, None, max_value)
         alertbox('Connection lost at ' + str(datetime.datetime.now()) + '.', 'Error')
         driver.quit()
-        return
+        return max_value, []
 
     time.sleep(5)
 
@@ -87,13 +101,16 @@ def record_speed(exec_path_driver: str):
     now = datetime.datetime.now()
     # Allow for webdriver to obtain webpage with results once it has been loaded in
     while driver.current_url == 'http://www.speedtest.net/':
+
         current = datetime.datetime.now()
         time_delta = current - now
         time_delta_sec = abs(time_delta.total_seconds())
+
         if time_delta_sec >= 180:
-            write_to_file(None, None, None)
+            write_to_file(None, None, None, max_value)
             driver.quit()
-            return
+            return max_value, []
+
         time.sleep(1)
 
     # Obtain URL with results
@@ -126,8 +143,12 @@ def record_speed(exec_path_driver: str):
         i += 1
 
     # Write data to internet record file for user, quit driver
-    write_to_file(data_titles, data_values, url)
+    data_tuple = write_to_file(data_titles, data_values, url, max_value)
+    max_value = data_tuple[0]
+    appendable_data = data_tuple[1]
     driver.quit()
+
+    return max_value, appendable_data
 
 
 # Parses the end time defined by the user such that it can be compared with the datetime package format. Returns
@@ -186,6 +207,22 @@ def invalid_delta(minute_delta, stop_hr) -> bool:
         return False
 
 
+# Labels each data point on graph with its value for ease of visual analysis.
+def label_plot(download, upload, ping, num_runs):
+    i = 0
+    for x in download:
+        plt.annotate(str(x), (num_runs[i], download[i]))
+        i += 1
+    i = 0
+    for n in upload:
+        plt.annotate(str(n), (num_runs[i], upload[i]))
+        i += 1
+    i = 0
+    for k in ping:
+        plt.annotate(str(k), (num_runs[i], ping[i]))
+        i += 1
+
+
 # Begins the speedtest using the user-defined minute intervals, stop time, and browser.
 def start_testing(minute_delta, stop_time: str, web_driver: str):
     stopping_hour = parse_time(stop_time)
@@ -198,11 +235,38 @@ def start_testing(minute_delta, stop_time: str, web_driver: str):
         return
 
     minute_delta = int(minute_delta)
+    greatest_value = 0
+    y_coords = []
 
     while True:
-        record_speed(web_driver)
+
+        speed_tuple = record_speed(web_driver, greatest_value)
+        greatest_value = speed_tuple[0]
+        data_to_plot = speed_tuple[1]
+
+        y_coords.extend(data_to_plot)
         time.sleep(minute_delta * 60)
         later = datetime.datetime.now()
+
         if later.hour == stopping_hour:
-            alertbox('Speedtesting complete.', 'Success')
+            dataset_length = int(len(y_coords) / 3)
+            total_length = len(y_coords)
+            x_axis = [i for i in range(1, dataset_length + 1)]
+
+            download = y_coords[0:total_length:3]
+            upload = y_coords[1:total_length:3]
+            ping = y_coords[2:total_length:3]
+
+            plt.plot(x_axis, download, 'vr')
+            plt.plot(x_axis, upload, '^c')
+            plt.plot(x_axis, ping, '.k')
+
+            plt.legend(['Download', 'Upload', 'Ping'])
+            plt.ylabel('Down/Upload, Ping (Mbps, ms)')
+            plt.xlabel('Test #')
+
+            label_plot(download, upload, ping, x_axis)
+            plt.axis([1, dataset_length, 0, (greatest_value + 10)])
+            plt.show()
             break
+
