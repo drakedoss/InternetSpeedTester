@@ -4,11 +4,7 @@ Internet Speed Tester by Drake Doss
 Program gives users the ability to access an automated testing environment for their internet speeds, allowing them to
 hold their Internet Service Provider (ISP) responsible for any false, "guaranteed" bandwidth/latency values.
 
-<<<<<<< HEAD
 v. 0.3, d. 07/19/2018
-=======
-v. 0.2, d. 07/10/2018
->>>>>>> a49e51503f9c44526714c197c448fec377afcc34
 """
 from selenium import webdriver
 from bs4 import BeautifulSoup
