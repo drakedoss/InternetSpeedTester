@@ -28,8 +28,10 @@ These facets of Internet Speed Tester give the user a complete report of her net
 
 Compiling an `exe` file is currently in the works for users that do not wish to take a developer's approach towards using the application. Otherwise, users are free to look at the pip-generated `requirements.txt` file listed within the repository for precise information about dependencies.
 
-## Running the code
-Internet Speed Tester can only be run within an integrated development environment (IDE) that supports the dependencies listed above. An executable file that is more user-friendly will be provided soon.
+## Running the program
+Internet Speed Tester can be run within an integrated development environment (IDE) that supports the dependencies listed above. The `requirements.txt` file will automatically download dependencies for you in IDEs like PyCharm, but if it doesn't work then you may have to use `pip`. However, an executable file titled `Internet Speed Tester` has been provided in a .zip folder if you wish to run the application in a more user-friendly fashion. Keep in mind the .py, .ico, .png, and `___driver.exe` files are bundled with the application so that it may function properly.
+
+If you are using Windows, you may be stopped by Windows Defender SmartScreen before running the application. Simply click "More info" and then "Run anyway." Should you be stopped by any other security software, feel free to scan the application or check out the source files before deeming it safe.
 
 ### Expected input and potential hiccups
 IST has been developed with human error and mischief in mind. Bugs, however, are not uncommon in software, and I do not grant my application to be the exception. Feel free to report any issues or errors you run into - the more, the merrier, as there is no fixing software without valuable feedback.
@@ -56,3 +58,6 @@ _**07.10.2018:**_
 
 _**07.19.2018:**_
 > A user can now see his or her speedtesting run in the form of a graph, thanks to the matplotlib library.
+
+_**07.20.2018:**_
+> Added ZIP folder for a more user-friendly experience. Allows for the application to be ran as an executable file and does not require the user to download dependencies.
