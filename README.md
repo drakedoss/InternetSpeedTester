@@ -23,6 +23,7 @@ These facets of Internet Speed Tester give the user a complete report of her net
 * Time and datetime libraries (built in)
 * Tkinter GUI library (v. 8.6)
 * requests library
+* Matplotlib library
 * Chromedriver and geckodriver for automated Google Chrome / Firefox applications (included in repository)
 
 Compiling an `exe` file is currently in the works for users that do not wish to take a developer's approach towards using the application. Otherwise, users are free to look at the pip-generated `requirements.txt` file listed within the repository for precise information about dependencies.
@@ -46,11 +47,12 @@ IST expects the following input from users:
 Input errors are handled by displaying a popup informing the user of how he should format his input for the program to interpret.
 
 ## Potential future revisions
-1. Graphical output of speed/latency versus the speedtest number.
-2. Automated calculation of speed/latency averages.
-3. Precise input for the program's "ending time."
-4. Adding test cases to the repository.
+1. Automated calculation of speed/latency averages.
+2. Precise input for the program's "ending time."
 
-## Fixes
+## Fixes and changes
 _**07.10.2018:**_
 > Implemented workaround for chromedriver bug, added requirements.txt to repository, wrote README content.
+
+_**07.19.2018:**_
+> A user can now see his or her speedtesting run in the form of a graph, thanks to the matplotlib library.
