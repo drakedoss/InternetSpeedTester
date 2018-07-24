@@ -10,11 +10,8 @@ macholib==1.9
 matplotlib==2.2.2
 numpy==1.14.5
 pefile==2017.11.5
-<<<<<<< HEAD
 PyInstaller==3.3.1
 pyparsing==2.2.0
-=======
->>>>>>> a49e51503f9c44526714c197c448fec377afcc34
 pypiwin32==223
 python-dateutil==2.7.3
 pytz==2018.5
